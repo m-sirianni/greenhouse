@@ -32,7 +32,7 @@ public class TimerRunnable implements Runnable {
 				jasone = (JSONArray) parser.parse(m.getBody());
 			} catch (ParseException e) {}
 			
-			String uri = "";
+			String uri = null;
 			long time = 0;
 			for(Object o : jasone) {
 				JSONObject serra = (JSONObject) o;
@@ -41,17 +41,21 @@ public class TimerRunnable implements Runnable {
 				time = (long) serra.get("time");
 			}
 			
+			String uri1 = uri;
+			// meglio usare il timestamp?
 			if(LocalTime.now().getHour() < 8 || LocalTime.now().getHour() >= 18 ) {
-				// invio messaggio al publisher per aprire irrigatori
+				try {
+					st.notify_msg(new Message("TT", "root/pt", "[{ \"uri\" : \"" + uri1 + "\", \"cmd\" : \"on\"}]"));
+				} catch (InterruptedException e1) {}
+				
 				Runnable tt = () -> { 
-					String body = "[{ \"uri\" : \"" + uri + "\", \"cmd\" : \"off\"}]"; 
 					try {
-						st.notify_msg(new Message("TT", "root/pt", body));
+						st.notify_msg(new Message("TT", "root/pt", "[{ \"uri\" : \"" + uri1 + "\", \"cmd\" : \"off\"}]"));
 					} catch (InterruptedException e) {}
 				};
 				timer.schedule((TimerTask) tt, time);
 			}
-				
+			
 		}
 
 	}
