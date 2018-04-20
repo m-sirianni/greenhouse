@@ -3,6 +3,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -13,8 +22,8 @@ public class HTTPServer {
 	
 	private static ArrayList<String> serre;
 	private static ArrayList<String> url_serre;
-	public static void main(String[] args) throws IOException, ParseException{
-		serre = new ArrayList<String>();
+	public static void main(String[] args) throws IOException, ParseException, MqttException{
+		/*serre = new ArrayList<String>();
 		url_serre = new ArrayList<String>();
 		
 		HttpServer server = HttpServer.create(new InetSocketAddress(10046), 0);
@@ -40,6 +49,44 @@ public class HTTPServer {
 		PublisherRunnable publisher = new PublisherRunnable(st);
 		TimerRunnable timer = new TimerRunnable(st);
 		WorkingRunnable working = new WorkingRunnable(st);
+		*/
+		MqttClient client = new MqttClient( 
+			    "tcp://193.206.55.23:1883", //URI 
+			    MqttClient.generateClientId(), //ClientId 
+			    new MemoryPersistence()); //Persistence
+		
+		client.setCallback(new MqttCallback() {
+			@Override
+            public void messageArrived(String topic, MqttMessage message) {
+				JSONParser parser = new JSONParser();
+			 	String json = message.toString();
+             	String json1 = json;
+             	System.out.println(json);
+             
+               JSONArray jasone = null;
+    		   try {
+				jasone = (JSONArray) parser.parse(json1);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		   System.out.println("caca");
+    			
+    			
+            }
+			
+			
+
+			@Override
+			public void connectionLost(Throwable arg0) {}
+
+			@Override
+			public void deliveryComplete(IMqttDeliveryToken arg0) {}
+		});
+		
+		client.connect();
+		client.subscribe("serre2/wgetr");
+		client.publish("serre2/wget/t1234", new MqttMessage("DynamicPage.json".getBytes()));
 		
 		
 		
