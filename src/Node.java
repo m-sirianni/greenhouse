@@ -10,7 +10,7 @@ public class Node<T>{
         this.data = data;
     }
 
-    public void addChild(Node<T> child) {
+    public synchronized void addChild(Node<T> child) {
         child.setParent(this);
         this.children.add(child);
     }
