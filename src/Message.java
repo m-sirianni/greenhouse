@@ -4,18 +4,18 @@ public class Message {
 	String method;
 	String uri;
 	String body;
-	String timeStamp;
+	Timestamp timeStamp;
 	
 	public Message(String method, String uri, String body) {
 		this.method = method;
 		this.uri = uri;
 		this.body = body;
-		Timestamp ts = new Timestamp(System.currentTimeMillis());
-		timeStamp = ts.toString();
+		timeStamp = new Timestamp(System.currentTimeMillis());
+	
 	}
 	
 	public String toString() {
-		return "[" + method + " " + uri + "]" + "[" + timeStamp + "]" + " " + body;
+		return "[" + method + " " + uri + "]" + "[" + timeStamp.toString() + "]" + " " + body;
 	}
 	
 	public String getBody() {

@@ -17,7 +17,7 @@ public class TimerRunnable implements Runnable {
 	
 	public void run() {
 		MessageQueue mq = new MessageQueue();
-		st.subscribe("root/tt", mq);
+		st.subscribe(HTTPServer.ROOT_NAME + "/tt", mq);
 		JSONParser parser = new JSONParser();
 		Timer timer = new Timer();
 		
@@ -43,17 +43,23 @@ public class TimerRunnable implements Runnable {
 			
 			String uri1 = uri;
 			// meglio usare il timestamp?
-			if(LocalTime.now().getHour() < 8 || LocalTime.now().getHour() >= 18 ) {
+			if(LocalTime.now().getHour() < 8 || LocalTime.now().getHour() > 18 ) {
 				try {
-					st.notify_msg(new Message("TT", "root/pt", "[{ \"uri\" : \"" + uri1 + "\", \"cmd\" : \"on\"}]"));
+					st.notify_msg(new Message("TT", HTTPServer.ROOT_NAME+"/pt", "[{ \"uri\" : \"" + uri1 + "\", \"cmd\" : \"on\"}]"));
 				} catch (InterruptedException e1) {}
 				
 				Runnable tt = () -> { 
 					try {
-						st.notify_msg(new Message("TT", "root/pt", "[{ \"uri\" : \"" + uri1 + "\", \"cmd\" : \"off\"}]"));
+						st.notify_msg(new Message("TT", HTTPServer.ROOT_NAME+"/pt", "[{ \"uri\" : \"" + uri1 + "\", \"cmd\" : \"off\"}]"));
 					} catch (InterruptedException e) {}
 				};
 				timer.schedule((TimerTask) tt, time);
+			}
+			
+			if(LocalTime.now().getHour() == 8) {
+				try {
+					st.notify_msg(new Message("TT", HTTPServer.ROOT_NAME+"/st", "[{ \"uri\" : \"" + uri1 + "\", \"cmd\" : \"on\"}]"));
+				} catch (InterruptedException e1) {}
 			}
 			
 		}

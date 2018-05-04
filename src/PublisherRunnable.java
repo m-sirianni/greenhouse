@@ -8,8 +8,10 @@ public class PublisherRunnable implements Runnable {
 	
 	public void run() {
 		MessageQueue mq = new MessageQueue();
-		st.subscribe("root/pt", mq);
+		st.subscribe(HTTPServer.ROOT_NAME+"/pt", mq);
 		while(true) {
+
+			
 			
 		}
 	}

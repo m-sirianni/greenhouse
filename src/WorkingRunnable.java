@@ -13,7 +13,7 @@ public class WorkingRunnable implements Runnable {
 	
 	public void run() {
 		MessageQueue mq = new MessageQueue();
-		st.subscribe("root/wt", mq);
+		st.subscribe(HTTPServer.ROOT_NAME + "/wt", mq);
 		Message m = null;
 		while(true) {
 			try {
@@ -42,14 +42,14 @@ public class WorkingRunnable implements Runnable {
 			// if controllo umidita` vero {
 			long time = calculateTime(temp, umi, rad);
 			try {
-				st.notify_msg(new Message("WT", "root/tt", "[{ \"uri\" : \"" + uri + "\", \"time\" : \"" + time + "\"}]"));
+				st.notify_msg(new Message("WT", HTTPServer.ROOT_NAME+"/tt", "[{ \"uri\" : \"" + uri + "\", \"time\" : \"" + time + "\"}]"));
 			} catch (InterruptedException e) {}
 			
 		}
 	}
 	
 	public long calculateTime(long temp, long umi, long rad) {
-		return 1;
+		return 42;
 	}
 
 }

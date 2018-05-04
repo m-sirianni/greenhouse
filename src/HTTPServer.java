@@ -1,4 +1,5 @@
 import java.io.FileNotFoundException;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -23,13 +24,15 @@ import org.json.simple.parser.ParseException;
 
 import com.sun.net.httpserver.HttpServer;
 
+
+
 public class HTTPServer {
 	
+	public final static String ROOT_NAME = "serre2";
 	
 	public static void main(String[] args) throws IOException, ParseException, MqttException, InterruptedException{
-		/*serre = new ArrayList<String>();
-		url_serre = new ArrayList<String>();
-		
+
+		/*
 		HttpServer server = HttpServer.create(new InetSocketAddress(10046), 0);
 		System.out.println("Server pronto sulla porta " + 10046);
 		server.createContext("/", new RootHandler());
@@ -39,45 +42,43 @@ public class HTTPServer {
 		server.start();
 		*/
 		SubjectTable st = new SubjectTable();
-		/*
-		parseConf();
-		MessageQueue arMq[] = new MessageQueue[serre.size()];
-		
-		for(int i=0; i<arMq.length ; i++)
-			arMq[i] = new MessageQueue();
+
 		
 		
-		for(int i=0;i<url_serre.size(); i++)
-			st.subscribe(url_serre.get(i), arMq[i]);
-		*/
+		PublisherRunnable publisher = new PublisherRunnable(st);
+		Thread pub_th = new Thread(publisher);
+		pub_th.start();
+		TimerRunnable timer = new TimerRunnable(st);
+		Thread ti_th = new Thread(timer);
+		ti_th.start();
+		WorkingRunnable working = new WorkingRunnable(st);
+		Thread wt_th = new Thread(working);
+		wt_th.start();
 		
-		//SubscriberRunnable subscriber = new SubscriberRunnable(st);
-		//PublisherRunnable publisher = new PublisherRunnable(st);
-		//TimerRunnable timer = new TimerRunnable(st);
-		//WorkingRunnable working = new WorkingRunnable(st);
-		
-		//JSONParser parser = new JSONParser();
 		MqttClient client = new MqttClient( 
-			    "tcp://193.206.55.23:1883", //URI 
-			    MqttClient.generateClientId(), //ClientId 
-			    new MemoryPersistence()); //Persistence
+			    "tcp://193.206.55.23:1883",
+			    MqttClient.generateClientId(),
+			    new MemoryPersistence());
 				
 		client.setCallback(new MqttCallback() {
 			@Override
             public void messageArrived(String topic, MqttMessage message) throws ParseException, InterruptedException {
 				String io = message.toString();
 				ArrayList<String> list = new ArrayList<String>();
-				ParsingThread pt = new ParsingThread(io, list);
+				ParsingThread pt = new ParsingThread(io, list, topic);
 				Thread th = new Thread(pt);
 				th.start();
 				th.join();
-				//System.out.println(list.size());
-				//System.out.println(Arrays.toString(list.toArray()));
 				for(String str : list) {
-					st.subscribe("serre1/" + str, new MessageQueue());
-					System.out.println("Sottoscritto a serre1/" + str );
+					st.subscribe(HTTPServer.ROOT_NAME + "/" + str, new MessageQueue());
+					if (str.contains("humidity")) {
+						Thread sub_th = new Thread(new SubscriberRunnable(st, str.split("/")[1]));
+						sub_th.start();
+						Thread.sleep(2000);
+						st.notify_msg(new Message("main", HTTPServer.ROOT_NAME+"/st_Cavoli" , "[{\"cmd\" : \"start\"}]"));
+						//st.notify_msg(new Message("main", HTTPServer.ROOT_NAME+"/st_Patate" , "[{\"cmd\" : \"start\"}]"));
+					}
 				}
-				//st.subscribe(, mq);
 			
             }
 
@@ -89,35 +90,13 @@ public class HTTPServer {
 		});
 		
 		client.connect();
-		client.subscribe("serre1/wgetr");
-		client.publish("serre1/wget/t1234", new MqttMessage("DynamicPage.json".getBytes()));
-		Thread.sleep(2000);
-		//st.subscribe("serre1/humidity/Cavoli", new MessageQueue());
-		st.printTable();
-		//Node<Subject> root = st.getRoot();
-		//st.visita(root);
+		client.subscribe(HTTPServer.ROOT_NAME +"/wgetr");
+		client.publish(HTTPServer.ROOT_NAME +"/wget/t1234", new MqttMessage("DynamicPage.json".getBytes()));
+		//Thread.sleep(2000);
+		//st.printTable();
 
 		
-	}
-
-	private static void parseConf(String json) throws FileNotFoundException, IOException, ParseException {
-		JSONParser parser = new JSONParser();
-		
-		JSONObject jasone = (JSONObject) parser.parse(json);
-		
-		
-		
-		//for(Object o : jasone) {
-			
-			
-			//String temp = (String) jasone.get("Temperatura");
-		   // System.out.println(radiazione);
-		
-		//}
-		
-		
-	}
-	
+	}	
 
 	
 }

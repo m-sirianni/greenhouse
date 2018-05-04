@@ -5,7 +5,7 @@ public class SubjectTable {
 	private Node<Subject> root;
 	
 	public  SubjectTable() {
-		root = new Node<Subject>(new Subject("serre1"));
+		root = new Node<Subject>(new Subject(HTTPServer.ROOT_NAME));
 	}
 	
 	public Node<Subject> getRoot(){
@@ -19,10 +19,8 @@ public class SubjectTable {
 		for (int i = 1; i < nodes.length; i++) {
 			if (curLvl.getChildren().isEmpty()) {
 				Node<Subject> child = new Node<Subject>(new Subject(nodes[i]));
-				System.out.println("1. Ho creato :" + child.getData().name);
-				curLvl.addChild(new Node<Subject>(new Subject(nodes[i])));
+				curLvl.addChild(child);
 				curLvl = child;
-				
 			}
 			
 			else {
@@ -31,7 +29,6 @@ public class SubjectTable {
 				
 				for(Node<Subject> s : curLvl.getChildren()) {
 					if (s.getData().name.equals(nodes[i]) ) {
-						System.out.println("Sono su :" + s.getData().name);
 						flag = true;
 						curLvl = s;
 						
@@ -40,20 +37,20 @@ public class SubjectTable {
 				
 				if (!flag) {
 					Node<Subject> child = new Node<Subject>(new Subject(nodes[i]));
-					System.out.println("2. Ho creato :" + child.getData().name);
-					curLvl.addChild(new Node<Subject>(new Subject(nodes[i])));
+					curLvl.addChild(child);
 					curLvl = child;
 					
 				}
 				
 			}
 			
-			/*if (i == nodes.length-1) {
+			
+			if (i == nodes.length-1) {
 				curLvl.getData().subscriber.add(mq);
 				//System.out.println(curLvl.getData().name);
 				
-			}*/
-			////rec_add(root, url, mq, 0);
+			}
+			rec_add(root, url, mq, 0);
 		}
 		
 		
@@ -64,13 +61,9 @@ public class SubjectTable {
 		
 		String nodes[] = url.split("/");
 		for(Node<Subject> child : n.getChildren()) {
-			//System.out.println(child.getData().name);
-			//System.out.println(nodes[j+1] + "\n");
 			if(child.getData().name.equals(nodes[j+1])) {
-				if(j+1 == nodes.length-1){
-					child.getData().subscriber.add(mq);
-					//System.out.println("Mi sono iscritto a :" + child.getData().name);
-				}
+				if(j+1 == nodes.length-1)
+					child.getData().subscriber.add(mq);	
 					
 				else
 					rec_add(child, url, mq, j+1);
@@ -98,7 +91,7 @@ public class SubjectTable {
 		String nodes[] = m.uri.split("/");
 		Node<Subject> curLvl = root;
 		
-		if (!nodes[0].equals("serre1")) return;
+		if (!nodes[0].equals(HTTPServer.ROOT_NAME)) return;
 		
 		for (MessageQueue mq : root.getData().subscriber) {
 			mq.send(m);
