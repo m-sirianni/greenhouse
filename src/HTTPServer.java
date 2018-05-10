@@ -73,12 +73,13 @@ public class HTTPServer {
 					st.subscribe(HTTPServer.ROOT_NAME + "/" + str, new MessageQueue());
 					if (str.contains("humidity")) {
 						Thread sub_th = new Thread(new SubscriberRunnable(st, str.split("/")[1]));
-						sub_th.start();
-						Thread.sleep(2000);
-						st.notify_msg(new Message("main", HTTPServer.ROOT_NAME+"/st_Cavoli" , "[{\"cmd\" : \"start\"}]"));
+						//sub_th.start();
+						//Thread.sleep(1000);
+					
 						//st.notify_msg(new Message("main", HTTPServer.ROOT_NAME+"/st_Patate" , "[{\"cmd\" : \"start\"}]"));
 					}
 				}
+				
 			
             }
 
@@ -92,7 +93,12 @@ public class HTTPServer {
 		client.connect();
 		client.subscribe(HTTPServer.ROOT_NAME +"/wgetr");
 		client.publish(HTTPServer.ROOT_NAME +"/wget/t1234", new MqttMessage("DynamicPage.json".getBytes()));
-		//Thread.sleep(2000);
+		Thread.sleep(2000);
+		//st.notify_msg(new Message("main", HTTPServer.ROOT_NAME+"/st_Cavoli" , "[{\"cmd\" : \"start\"}]"));
+		//Thread.sleep(120000);
+		//st.notify_msg(new Message("main", HTTPServer.ROOT_NAME+"/st_Cavoli" , "[{\"cmd\" : \"stop\"}]"));
+		st.notify_msg(new Message("st", HTTPServer.ROOT_NAME+"/wt" , "[{ \"coltura\" : \"Patate\", \"temp\" :\"16.24722\" , \"rad\" : \"2205.8425\" , \"hum_morn\" : \"99.95362\" , \"hum_even\" : \"0.0\" }]"));
+		st.notify_msg(new Message("st", HTTPServer.ROOT_NAME+"/wt" , "[{ \"coltura\" : \"Piselli\", \"temp\" :\"16.24722\" , \"rad\" : \"2205.8425\" , \"hum_morn\" : \"99.95362\" , \"hum_even\" : \"0.0\" }]"));
 		//st.printTable();
 
 		

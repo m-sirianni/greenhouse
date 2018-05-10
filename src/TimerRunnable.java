@@ -2,6 +2,9 @@ import java.io.FileReader;
 import java.time.LocalTime;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -26,41 +29,37 @@ public class TimerRunnable implements Runnable {
 			try {
 				m = mq.receive();
 			} catch (InterruptedException e) {}
-			
+			System.out.println(m.body);
 			JSONArray jasone = null;
 			try {
 				jasone = (JSONArray) parser.parse(m.getBody());
 			} catch (ParseException e) {}
 			
-			String uri = null;
+			String coltura = null;
 			long time = 0;
 			for(Object o : jasone) {
 				JSONObject serra = (JSONObject) o;
 				
-				uri = (String) serra.get("uri");
-				time = (long) serra.get("time");
+				coltura = (String) serra.get("coltura");
+				time = (long) Float.parseFloat((String) serra.get("time"));
 			}
 			
-			String uri1 = uri;
+			String coltura1 = coltura;
 			// meglio usare il timestamp?
-			if(LocalTime.now().getHour() < 8 || LocalTime.now().getHour() > 18 ) {
-				try {
-					st.notify_msg(new Message("TT", HTTPServer.ROOT_NAME+"/pt", "[{ \"uri\" : \"" + uri1 + "\", \"cmd\" : \"on\"}]"));
-				} catch (InterruptedException e1) {}
-				
-				Runnable tt = () -> { 
-					try {
-						st.notify_msg(new Message("TT", HTTPServer.ROOT_NAME+"/pt", "[{ \"uri\" : \"" + uri1 + "\", \"cmd\" : \"off\"}]"));
-					} catch (InterruptedException e) {}
-				};
-				timer.schedule((TimerTask) tt, time);
-			}
+						//if(LocalTime.now().getHour() < 8 || LocalTime.now().getHour() > 18 ) {
+			try {
+				st.notify_msg(new Message("TT", HTTPServer.ROOT_NAME+"/pt", "[{ \"coltura\" : \"" + coltura + "\", \"cmd\" : \"ON\"}]"));
+			} catch (InterruptedException e1) {}
 			
-			if(LocalTime.now().getHour() == 8) {
+			ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
+			Runnable task = () -> {
 				try {
-					st.notify_msg(new Message("TT", HTTPServer.ROOT_NAME+"/st", "[{ \"uri\" : \"" + uri1 + "\", \"cmd\" : \"on\"}]"));
-				} catch (InterruptedException e1) {}
-			}
+					st.notify_msg(new Message("TT", HTTPServer.ROOT_NAME+"/pt", "[{ \"coltura\" : \"" + coltura1 + "\", \"cmd\" : \"OFF\"}]"));
+				} catch (InterruptedException e) {}
+			};
+			
+			executor.schedule(task, time, TimeUnit.SECONDS);
 			
 		}
 

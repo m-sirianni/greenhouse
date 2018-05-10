@@ -12,9 +12,9 @@ public class MessageQueue {
 	public synchronized void send(Message m) throws InterruptedException {
 		queue.add(m);
 		if (queue.size() > SIZE)
-			queue.remove();
+			queue.poll();
 		if (queue.size() == 1)
-			this.notify();	
+			this.notifyAll();	
 	}
 
 	public synchronized Message receive() throws InterruptedException {

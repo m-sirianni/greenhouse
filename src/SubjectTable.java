@@ -62,8 +62,13 @@ public class SubjectTable {
 		String nodes[] = url.split("/");
 		for(Node<Subject> child : n.getChildren()) {
 			if(child.getData().name.equals(nodes[j+1])) {
-				if(j+1 == nodes.length-1)
-					child.getData().subscriber.add(mq);	
+				if(j+1 == nodes.length-1){
+					if(!child.getData().subscriber.contains(mq)) {
+						System.out.println(child.getData().name);
+						child.getData().subscriber.add(mq);	
+					}
+				}
+					
 					
 				else
 					rec_add(child, url, mq, j+1);
@@ -106,10 +111,10 @@ public class SubjectTable {
 				
 				if(sub.getData().name.equals(nodes[i])) {
 					curLvl = sub;
-					//System.out.println(curLvl.getData().name + " " + curLvl.getData().subscriber.size());
+					
 					for(MessageQueue mq : curLvl.getData().subscriber) {
-						//System.out.println("Sto notificando : "+ curLvl.getData().name);
 						mq.send(m);
+						//break;
 					}
 					
 					break;
