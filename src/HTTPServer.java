@@ -32,19 +32,16 @@ public class HTTPServer {
 	
 	public static void main(String[] args) throws IOException, ParseException, MqttException, InterruptedException{
 
-		/*
+		SubjectTable st = new SubjectTable();
+
 		HttpServer server = HttpServer.create(new InetSocketAddress(10046), 0);
 		System.out.println("Server pronto sulla porta " + 10046);
 		server.createContext("/", new RootHandler());
 		server.createContext("/echoHeader", new EchoHeaderHandler());
-		server.createContext("/echoPost", new EchoPostHandler());
+		server.createContext("/echoPost", new EchoPostHandler(st));
 		server.setExecutor(null);
 		server.start();
-		*/
-		SubjectTable st = new SubjectTable();
 
-		
-		
 		PublisherRunnable publisher = new PublisherRunnable(st);
 		Thread pub_th = new Thread(publisher);
 		pub_th.start();
@@ -93,7 +90,7 @@ public class HTTPServer {
 		client.connect();
 		client.subscribe(HTTPServer.ROOT_NAME +"/wgetr");
 		client.publish(HTTPServer.ROOT_NAME +"/wget/t1234", new MqttMessage("DynamicPage.json".getBytes()));
-		Thread.sleep(2000);
+		//Thread.sleep(2000);
 		//st.notify_msg(new Message("main", HTTPServer.ROOT_NAME+"/st_Cavoli" , "[{\"cmd\" : \"start\"}]"));
 		//Thread.sleep(120000);
 		//st.notify_msg(new Message("main", HTTPServer.ROOT_NAME+"/st_Cavoli" , "[{\"cmd\" : \"stop\"}]"));
