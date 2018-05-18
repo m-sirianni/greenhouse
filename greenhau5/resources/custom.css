@@ -1,0 +1,23 @@
+.jumbotron {
+    background-image: url("https://abload.de/img/bgdxrx9.jpg");
+    background-color: #17234E;
+	 color: white;
+    margin-bottom: 75;`enter code here`
+    min-height: 50%;
+    background-repeat: no-repeat;
+    background-position: center;
+    -webkit-background-size: cover;
+    background-size: cover;
+	 font-family: "Arial Black";
+    letter-spacing: -8.7px;
+    text-shadow: 0.7px 0.7px 1.3px #000000;
+}
+
+.jumbotron p {
+  	 	font-family: "Arial";
+    	letter-spacing: 0px;
+    }
+
+.button {
+	border:0;
+}
