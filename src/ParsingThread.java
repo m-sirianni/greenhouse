@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Set;
 
 import org.json.simple.JSONArray;
@@ -23,8 +22,7 @@ public class ParsingThread implements Runnable {
 		JSONParser parser = new JSONParser();
 		JSONArray o = null;
 		JSONObject obj = null;
-		
-		
+	
 		if((HTTPServer.ROOT_NAME + "/wgetr").equals(topic)) {
 			json = json.trim();
 			json = json.replaceAll("\"list\": ", "");

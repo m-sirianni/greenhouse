@@ -1,13 +1,11 @@
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -60,7 +58,6 @@ public class SubscriberRunnable implements Runnable {
 	        public void messageArrived(String topic, MqttMessage message) throws InterruptedException {
 					
 				String io = message.toString();
-				Float val = (float) 0;
 				ArrayList<String> ar = new ArrayList<String>();					
 				
 				if(topic.contains("Temperatura")){
@@ -80,12 +77,12 @@ public class SubscriberRunnable implements Runnable {
 					Thread th = new Thread(pt);
 					th.start();
 					th.join();
-					if(hour==11 && min == 10){
+					if(hour==9 && min == 36){
 						float f = Float.parseFloat(ar.remove(0));
 						humidity_morn = f;
 					}
 						
-					if(hour==11 && min == 12){
+					if(hour==9 && min == 38){
 						float f = Float.parseFloat(ar.remove(0));
 						humidity_even = f;
 						flag= true;
@@ -110,14 +107,11 @@ public class SubscriberRunnable implements Runnable {
 					rad_media = rad/cont;
 					rad = rad_media;
 					cont = 1;
-					System.out.println("temperatura del sole " + temp + " " + coltura);
-					System.out.println("radiazioni gamma " + rad + " " + coltura);
 				}
 				
 				if(flag==true){
 					flag = false;
 				    mex = new Message("ST", HTTPServer.ROOT_NAME+"/wt", "[{ \"coltura\" : \"" + coltura + "\", \"temp\" :\"" + temp_media + "\" , \"rad\" : \"" + rad_media + "\" , \"hum_morn\" : \"" + humidity_morn + "\" , \"hum_even\" : \"" + humidity_even + "\" }]");
-					System.out.println(mex.body);
 				}
 			}
 
@@ -131,13 +125,13 @@ public class SubscriberRunnable implements Runnable {
 		while (true) {
 			try {
 				m = mq.receive();
-			} catch (InterruptedException e) { System.out.println("Eccezione 1");}
+			} catch (InterruptedException e) {}
 		
 			JSONArray jasone = null;
 			try {
 				jasone = (JSONArray) parser.parse(m.getBody());
 				System.out.println(m.body);
-			} catch (ParseException e) {System.out.println("Eccezione 2");}
+			} catch (ParseException e) {}
 			
 			String cmd = null;
 			
@@ -153,11 +147,11 @@ public class SubscriberRunnable implements Runnable {
 				
 					client.connect();
 				
-				} catch (MqttException e) {System.out.println("Eccezione 3 ");} 
+				} catch (MqttException e) {} 
 
 				try {
 					client.subscribe(new String [] {HTTPServer.ROOT_NAME+"/Temperatura", HTTPServer.ROOT_NAME+"/Radiazione", HTTPServer.ROOT_NAME+"/humidity/"+coltura});
-				} catch (MqttException e) {System.out.println("Eccezione 5");}
+				} catch (MqttException e) {}
 				cal.setTimeInMillis(m.timeStamp.getTime());
 				hour = cal.get(Calendar.HOUR_OF_DAY);
 				min = cal.get(Calendar.MINUTE);

@@ -1,7 +1,3 @@
-import java.io.FileReader;
-import java.time.LocalTime;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,14 +18,13 @@ public class TimerRunnable implements Runnable {
 		MessageQueue mq = new MessageQueue();
 		st.subscribe(HTTPServer.ROOT_NAME + "/tt", mq);
 		JSONParser parser = new JSONParser();
-		Timer timer = new Timer();
 		
 		while(true) {
 			Message m = null;
 			try {
 				m = mq.receive();
 			} catch (InterruptedException e) {}
-			System.out.println(m.body);
+			//System.out.println(m.body);
 			JSONArray jasone = null;
 			try {
 				jasone = (JSONArray) parser.parse(m.getBody());
@@ -49,13 +44,15 @@ public class TimerRunnable implements Runnable {
 						//if(LocalTime.now().getHour() < 8 || LocalTime.now().getHour() > 18 ) {
 			try {
 				st.notify_msg(new Message("TT", HTTPServer.ROOT_NAME+"/pt", "[{ \"coltura\" : \"" + coltura + "\", \"cmd\" : \"ON\"}]"));
+				st.notify_msg(new Message("TT", HTTPServer.ROOT_NAME+"/logger", "\"" +coltura+ "\"" + " switched on"));
 			} catch (InterruptedException e1) {}
 			
 			ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
 			Runnable task = () -> {
 				try {
-					st.notify_msg(new Message("TT", HTTPServer.ROOT_NAME+"/pt", "[{ \"coltura\" : \"" + coltura1 + "\", \"cmd\" : \"OFF\"}]"));
+					st.notify_msg(new Message("TT", HTTPServer.ROOT_NAME+"/pt", "[{ \"coltura\" : \"" +coltura1+ "\", \"cmd\" : \"OFF\"}]"));
+					st.notify_msg(new Message("TT", HTTPServer.ROOT_NAME+"/logger", "\"" +coltura1+ "\"" + " switched off"));
 				} catch (InterruptedException e) {}
 			};
 			

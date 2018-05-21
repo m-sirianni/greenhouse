@@ -19,9 +19,7 @@ public class PublisherRunnable implements Runnable {
 		st.subscribe(HTTPServer.ROOT_NAME+"/pt", mq);
 		JSONParser parser = new JSONParser();
 		MqttClient client = null;
-		
-		
-		
+			
 		try {
 			client = new MqttClient( 
 				    "tcp://193.206.55.23:1883",
@@ -54,7 +52,7 @@ public class PublisherRunnable implements Runnable {
 				
 				try {
 					client.publish(HTTPServer.ROOT_NAME +"/control/set", new MqttMessage(("{\"" + coltura + "\":\""+ cmd +"\"}").getBytes()));
-					System.out.println("{\"" + coltura + "\":\""+ cmd +"\"}");
+					//System.out.println("{\"" + coltura + "\":\""+ cmd +"\"}");
 				} catch (MqttException e) {}
 			
 			

@@ -47,7 +47,7 @@ public class WorkingRunnable implements Runnable {
 				try {
 				st.notify_msg(new Message("WT", HTTPServer.ROOT_NAME+"/tt", "[{ \"coltura\" : \"" + coltura + "\", \"time\" : \"" + time + "\"}]"));
 				} catch (InterruptedException e) {}
-			System.out.println(time);
+			//System.out.println(time);
 			}
 			
 		}
@@ -62,7 +62,7 @@ public class WorkingRunnable implements Runnable {
 			if(i>0){
 				litritot = (float)1.13 *i;
 				time = (long) ((litritot/15)*60);
-				System.out.println(time);
+				//System.out.println(time);
 			}
 		}
 		

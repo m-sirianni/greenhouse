@@ -1,4 +1,3 @@
-import java.util.Arrays;
 
 public class SubjectTable {
 	
@@ -64,7 +63,6 @@ public class SubjectTable {
 			if(child.getData().name.equals(nodes[j+1])) {
 				if(j+1 == nodes.length-1){
 					if(!child.getData().subscriber.contains(mq)) {
-						System.out.println(child.getData().name);
 						child.getData().subscriber.add(mq);	
 					}
 				}
@@ -146,7 +144,6 @@ public class SubjectTable {
 			return;
 		
 		for (Node<Subject> sub : node.getChildren()) {
-			System.out.println("Lvl: " + lvl + " " + sub.getData().name);
 			unPrint(sub, lvl+1);
 		}
 		
@@ -156,7 +153,6 @@ public class SubjectTable {
 	public synchronized void printTable (){
 		
 		for(Node<Subject> node : root.getChildren()) {
-			System.out.println("Lvl: 1 " + node.getData().name);
 			unPrint(node, 2);
 		}
 		
@@ -167,11 +163,9 @@ public class SubjectTable {
 		if (node.getChildren().isEmpty())
 			return;
 		
-		for (Node<Subject> sub : node.getChildren()) {
-				System.out.println(sub.getData().name);
-			
+		for (Node<Subject> sub : node.getChildren()) 
 			visita_rec(sub);
-		}
+		
 		
 	}
 	
