@@ -2,18 +2,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-public class ResourcesHandler implements HttpHandler {
-
+public class ConfigRoot implements HttpHandler {
 	@Override
 	public void handle(HttpExchange he) throws IOException {
-		File res = new File("greenhau5" +he.getRequestURI().getPath());
-		he.sendResponseHeaders(200, res.length());
+		File index = new File("greenhau5/load_config.html");
+		he.sendResponseHeaders(200, index.length());
 		OutputStream os = he.getResponseBody();
-		Files.copy(res.toPath(), os);
+		Files.copy(index.toPath(), os);
 		os.close();
 	}
-
 }

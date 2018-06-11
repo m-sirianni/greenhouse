@@ -30,8 +30,6 @@ public class SubscriberRunnable implements Runnable {
 	public SubscriberRunnable(SubjectTable st, String coltura) {
 		this.st=st;
 		this.coltura=coltura;
-		humidity_morn = 0;
-		humidity_even = 0;
 		temp = 0;
 		rad = 0;
 		cont = 0;
@@ -42,13 +40,13 @@ public class SubscriberRunnable implements Runnable {
 		MessageQueue mq = new MessageQueue();
 		Calendar cal = Calendar.getInstance();
 		
-		st.subscribe(HTTPServer.ROOT_NAME+"/st_" + coltura, mq);
+		st.subscribe(Main.ROOT_NAME+"/st_" + coltura, mq);
 		
 		Message m = null;
 		MqttClient client = null;
 		try {
 			client = new MqttClient( 
-				    "tcp://193.206.55.23:1883",
+				    "tcp://" +Main.MQTT_IP+ ":1883",
 				    MqttClient.generateClientId(),
 				    new MemoryPersistence());
 		} catch (MqttException e) {}
@@ -72,23 +70,6 @@ public class SubscriberRunnable implements Runnable {
 					}
 				}
 					
-				if(topic.contains("humidity")){
-					ParsingThread pt = new ParsingThread(io, ar, topic);
-					Thread th = new Thread(pt);
-					th.start();
-					th.join();
-					if(hour==9 && min == 36){
-						float f = Float.parseFloat(ar.remove(0));
-						humidity_morn = f;
-					}
-						
-					if(hour==9 && min == 38){
-						float f = Float.parseFloat(ar.remove(0));
-						humidity_even = f;
-						flag= true;
-					}
-				}
-					
 				if(topic.contains("Radiazione")){
 					ParsingThread pt = new ParsingThread(io, ar, topic);
 					Thread th = new Thread(pt);
@@ -97,8 +78,7 @@ public class SubscriberRunnable implements Runnable {
 					if(cal.get(Calendar.HOUR_OF_DAY) < 18 && cal.get(Calendar.HOUR_OF_DAY) >= 8 ){
 						float f = Float.parseFloat(ar.remove(0));
 						rad += f;
-					}
-						
+					}		
 				}
 					
 				if(cont == 5){
@@ -111,7 +91,7 @@ public class SubscriberRunnable implements Runnable {
 				
 				if(flag==true){
 					flag = false;
-				    mex = new Message("ST", HTTPServer.ROOT_NAME+"/wt", "[{ \"coltura\" : \"" + coltura + "\", \"temp\" :\"" + temp_media + "\" , \"rad\" : \"" + rad_media + "\" , \"hum_morn\" : \"" + humidity_morn + "\" , \"hum_even\" : \"" + humidity_even + "\" }]");
+				    mex = new Message("ST", Main.ROOT_NAME+"/wt", "[{ \"coltura\" : \"" + coltura + "\", \"temp\" :\"" + temp_media + "\" , \"rad\" : \"" + rad_media + "\" , \"hum_morn\" : \"" + humidity_morn + "\" , \"hum_even\" : \"" + humidity_even + "\" }]");
 				}
 			}
 
@@ -128,37 +108,27 @@ public class SubscriberRunnable implements Runnable {
 			} catch (InterruptedException e) {}
 		
 			JSONArray jasone = null;
-			try {
-				jasone = (JSONArray) parser.parse(m.getBody());
-				System.out.println(m.body);
-			} catch (ParseException e) {}
+			try { jasone = (JSONArray) parser.parse(m.getBody()); } catch (ParseException e) {}
 			
 			String cmd = null;
 			
 			for(Object o : jasone) {
 				JSONObject serra = (JSONObject) o;
-				
 				cmd = (String) serra.get("cmd");
 			}
 			
 			if(cmd.equals("start")){
-				
+				try { client.connect(); } catch (MqttException e) {}
 				try {
-				
-					client.connect();
-				
-				} catch (MqttException e) {} 
-
-				try {
-					client.subscribe(new String [] {HTTPServer.ROOT_NAME+"/Temperatura", HTTPServer.ROOT_NAME+"/Radiazione", HTTPServer.ROOT_NAME+"/humidity/"+coltura});
+					client.subscribe(new String [] {Main.ROOT_NAME+"/Temperatura", Main.ROOT_NAME+"/Radiazione", Main.ROOT_NAME+"/humidity/"+coltura});
 				} catch (MqttException e) {}
+				
 				cal.setTimeInMillis(m.timeStamp.getTime());
 				hour = cal.get(Calendar.HOUR_OF_DAY);
 				min = cal.get(Calendar.MINUTE);
 			}
 			
-			if(cmd.equals("stop")){
-				
+			if(cmd.equals("stop")){			
 				cal.setTimeInMillis(m.timeStamp.getTime());
 				hour = cal.get(Calendar.HOUR_OF_DAY);
 				min = cal.get(Calendar.MINUTE);
@@ -166,9 +136,6 @@ public class SubscriberRunnable implements Runnable {
 					//st.notify_msg(mex);
 				//} catch (InterruptedException e) {}
 			}
-			
-			
-		
 		}
 	}
 

@@ -7,22 +7,16 @@ public class WorkingRunnable implements Runnable {
 	private SubjectTable st;
 	JSONParser parser = new JSONParser();
 
-	public WorkingRunnable(SubjectTable st) {
-		this.st=st;
+	public WorkingRunnable() {
+		this.st = Main.st;
 	}
 	
 	public void run() {
 		MessageQueue mq = new MessageQueue();
-		st.subscribe(HTTPServer.ROOT_NAME + "/wt", mq);
+		st.subscribe(Main.ROOT_NAME + "/wt", mq);
 		Message m = null;
 		while(true) {
-			try {
-				// Messaggio del tipo:
-				// Method: st
-				// URI: "root/wt"
-				// Body: [{"uri": "root/serre/...", "temp": "30", "umi": "70", "rad", "1500"}]
-				m = mq.receive();
-			} catch (InterruptedException e) {}
+			try { m = mq.receive(); } catch (InterruptedException e) {}
 			
 			JSONArray jasone = null;
 			try {
@@ -45,7 +39,7 @@ public class WorkingRunnable implements Runnable {
 			float time = calculateTime(coltura, temp, hum_morn, hum_even, rad);
 			if(time!=0){
 				try {
-				st.notify_msg(new Message("WT", HTTPServer.ROOT_NAME+"/tt", "[{ \"coltura\" : \"" + coltura + "\", \"time\" : \"" + time + "\"}]"));
+				st.notify_msg(new Message("WT", Main.ROOT_NAME+"/tt", "[{ \"coltura\" : \"" + coltura + "\", \"time\" : \"" + time + "\"}]"));
 				} catch (InterruptedException e) {}
 			//System.out.println(time);
 			}

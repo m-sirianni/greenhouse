@@ -10,19 +10,19 @@ import org.json.simple.parser.ParseException;
 public class PublisherRunnable implements Runnable {
 	private SubjectTable st;
 
-	public PublisherRunnable(SubjectTable st) {
-		this.st=st;
+	public PublisherRunnable() {
+		this.st = Main.st;
 	}
 	
 	public void run() {
 		MessageQueue mq = new MessageQueue();
-		st.subscribe(HTTPServer.ROOT_NAME+"/pt", mq);
+		st.subscribe(Main.ROOT_NAME+"/pt", mq);
 		JSONParser parser = new JSONParser();
 		MqttClient client = null;
 			
 		try {
 			client = new MqttClient( 
-				    "tcp://193.206.55.23:1883",
+				    "tcp://" +Main.MQTT_IP+ ":1883",
 				    MqttClient.generateClientId(),
 				    new MemoryPersistence());
 		} catch (MqttException e1) {}
@@ -51,8 +51,7 @@ public class PublisherRunnable implements Runnable {
 				}
 				
 				try {
-					client.publish(HTTPServer.ROOT_NAME +"/control/set", new MqttMessage(("{\"" + coltura + "\":\""+ cmd +"\"}").getBytes()));
-					//System.out.println("{\"" + coltura + "\":\""+ cmd +"\"}");
+					client.publish(Main.ROOT_NAME +"/control/set", new MqttMessage(("{\"" + coltura + "\":\""+ cmd +"\"}").getBytes()));
 				} catch (MqttException e) {}
 			
 			

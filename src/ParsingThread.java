@@ -23,7 +23,7 @@ public class ParsingThread implements Runnable {
 		JSONArray o = null;
 		JSONObject obj = null;
 	
-		if((HTTPServer.ROOT_NAME + "/wgetr").equals(topic)) {
+		if((Main.ROOT_NAME + "/wgetr").equals(topic)) {
 			json = json.trim();
 			json = json.replaceAll("\"list\": ", "");
 			json = json.substring(1, json.length()-1);
@@ -37,15 +37,13 @@ public class ParsingThread implements Runnable {
 				Set<?> str =( (JSONObject) ob).keySet();
 				if(!str.toArray()[0].equals("Temperatura") && !str.toArray()[0].equals("Radiazione"))
 					list.add((String) "humidity/" + str.toArray()[0]);
-				
 				else 
 					list.add((String) str.toArray()[0]);
-				
 			}
 		}
 		
-		if((HTTPServer.ROOT_NAME + "/Temperatura").equals(topic) ||
-		   (HTTPServer.ROOT_NAME + "/Radiazione").equals(topic)) {
+		if((Main.ROOT_NAME + "/Temperatura").equals(topic) ||
+		   (Main.ROOT_NAME + "/Radiazione").equals(topic)) {
 			try {
 				obj = (JSONObject) parser.parse(json);
 			} catch (ParseException e) {}
@@ -54,16 +52,13 @@ public class ParsingThread implements Runnable {
 				list.add(str);
 		}
 		
-		if(topic.contains(HTTPServer.ROOT_NAME + "/humidity")) {
+		if(topic.contains(Main.ROOT_NAME + "/humidity")) {
 			try {
 				obj = (JSONObject) parser.parse(json);
 			} catch (ParseException e) {}
 			
 				String str = (String) obj.get("humidity");
 				list.add(str);
-		}
-		
-	}
-	
+		}		
+	}	
 }
-

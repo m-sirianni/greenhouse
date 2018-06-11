@@ -5,9 +5,7 @@ public class MessageQueue {
 	private String threadId;
 	int SIZE = 10;
 
-	public MessageQueue() {
-		queue = new LinkedList<Message>();
-	}
+	public MessageQueue() { queue = new LinkedList<Message>(); }
 	
 	public synchronized void send(Message m) throws InterruptedException {
 		queue.add(m);
@@ -19,21 +17,10 @@ public class MessageQueue {
 
 	public synchronized Message receive() throws InterruptedException {
 		while (queue.isEmpty())
-			this.wait();
-		
+			this.wait();	
 		return queue.poll();
 	}
 	
-	public String getThId() {
-		return threadId;
-	}
-	
-	public void setThId (String s){
-		threadId = s;
-	}
-	
-	public LinkedList<Message> getQueue() {
-		return queue;
-	}
-	
+	public String getThId() { return threadId; }
+		
 }
