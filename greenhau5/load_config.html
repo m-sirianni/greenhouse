@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Greenhau5 - Config page</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.7/css/bootstrap-dialog.min.css">
+	<link rel="stylesheet" type="text/css" href="resources/custom.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.7/js/bootstrap-dialog.min.js" type="text/javascript"></script>
+</head>
+
+<body>
+<div class="jumbotron text-center">
+  <h1>greenhau5</h1>
+  <p>ghost peppers n stuff</p> 
+</div>
+<div class="container"></div>
+<div id="config">
+	<p align="center">Caricare il file di configurazione</p>
+	<p align="center"><input type="file" id="input"></p>
+</div>
+
+<div id="reset">
+	<p align="center">Per resettare l'applicazione, premere su "Reset"</p>
+	<p align="center"><button onclick="reset()">Reset</button></p>
+</div>
+
+<script>
+
+document.getElementById('input').onchange = function(){
+	var file = this.files[0];
+	var reader = new FileReader();
+	reader.onload = function(progressEvent){
+		$.ajax({ type: "POST", url: "/load", data: reader.result, 
+			success: function(d) {console.log("OK");},
+			error: function(d) {console.log("Male male");}
+		});
+	};
+	reader.readAsText(file);
+};
+
+function reset() {
+		$.ajax({ type: "POST", url: "/reset", data: "reset", 
+		success: function(d) {console.log("OK");},
+		error: function(d) {console.log("Male male");}
+	});
+}
+
+</script>
+
+</body>
+</html>
