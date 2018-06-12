@@ -117,19 +117,19 @@ public class SubscriberRunnable implements Runnable {
 				cmd = (String) serra.get("cmd");
 			}
 			
-			if(cmd.equals("start")){
-				try { client.connect(); } catch (MqttException e) {}
-				try {
+			if(cmd.equals("start")) {
+				try { 
+					client.connect();
 					client.subscribe(new String [] {Main.ROOT_NAME+"/Temperatura", Main.ROOT_NAME+"/Radiazione", Main.ROOT_NAME+"/humidity/"+coltura});
 				} catch (MqttException e) {}
 				
-				cal.setTimeInMillis(m.timeStamp.getTime());
+				cal.setTimeInMillis(m.getTimeStamp().getTime());
 				hour = cal.get(Calendar.HOUR_OF_DAY);
 				min = cal.get(Calendar.MINUTE);
 			}
 			
 			if(cmd.equals("stop")){			
-				cal.setTimeInMillis(m.timeStamp.getTime());
+				cal.setTimeInMillis(m.getTimeStamp().getTime());
 				hour = cal.get(Calendar.HOUR_OF_DAY);
 				min = cal.get(Calendar.MINUTE);
 				//try {

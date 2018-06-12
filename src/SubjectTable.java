@@ -26,7 +26,7 @@ public class SubjectTable {
 				boolean flag = false;
 				
 				for(Node<Subject> s : curLvl.getChildren()) {
-					if (s.getData().name.equals(nodes[i]) ) {
+					if (s.getData().getName().equals(nodes[i]) ) {
 						flag = true;
 						curLvl = s;
 					}
@@ -40,7 +40,7 @@ public class SubjectTable {
 			}
 			
 			if (i == nodes.length-1)
-				curLvl.getData().subscriber.add(mq);	
+				curLvl.getData().getSubscriber().add(mq);	
 			rec_add(root, url, mq, 0);
 		}
 	
@@ -50,41 +50,25 @@ public class SubjectTable {
 	private void rec_add(Node<Subject> n, String url, MessageQueue mq, int j){
 		String nodes[] = url.split("/");
 		for(Node<Subject> child : n.getChildren()) {
-			if(child.getData().name.equals(nodes[j+1])) {
+			if(child.getData().getName().equals(nodes[j+1])) {
 				if(j+1 == nodes.length-1){
-					if(!child.getData().subscriber.contains(mq)) {
-						child.getData().subscriber.add(mq);	
+					if(!child.getData().getSubscriber().contains(mq)) {
+						child.getData().getSubscriber().add(mq);	
 					}
 				}
 					
-				else
-					rec_add(child, url, mq, j+1);
+				else rec_add(child, url, mq, j+1);
 			}
 		}	
 	}
 	
-	public Node<Subject> lastNode(Node<Subject> n, String url, MessageQueue mq, int j){
-		String nodes[] = url.split("/");
-		if(n.getChildren().isEmpty()) return null;
-		for(Node<Subject> child : n.getChildren()) {
-			if(j+1 == nodes.length-1) {
-				if(child.getData().name.equals(nodes[j+1]))
-					return child;
-				else return null;
-			}
-			return lastNode(child, url, mq, j+1);
-		}
-		return null;
-		
-	}
-	
 	public synchronized void notify_msg(Message m) throws InterruptedException {
-		String nodes[] = m.uri.split("/");
+		String nodes[] = m.getUri().split("/");
 		Node<Subject> curLvl = root;
 		
 		if (!nodes[0].equals(Main.ROOT_NAME)) return;
 		
-		for (MessageQueue mq : root.getData().subscriber) {
+		for (MessageQueue mq : root.getData().getSubscriber()) {
 			mq.send(m);
 		}
 		
@@ -95,12 +79,11 @@ public class SubjectTable {
 				
 			for (Node<Subject> sub : curLvl.getChildren()) {
 				
-				if(sub.getData().name.equals(nodes[i])) {
+				if(sub.getData().getName().equals(nodes[i])) {
 					curLvl = sub;
 					
-					for(MessageQueue mq : curLvl.getData().subscriber)
+					for(MessageQueue mq : curLvl.getData().getSubscriber())
 						mq.send(m);
-
 					break;
 				}
 					
@@ -113,7 +96,7 @@ public class SubjectTable {
 			return;
 		
 		for (Node<Subject> sub : node.getChildren()) {
-			sub.getData().subscriber.removeIf(b -> b.getThId().equals(threadid));
+			sub.getData().getSubscriber().removeIf(b -> b.getThId().equals(threadid));
 			byebye(sub, threadid);
 		}
 		

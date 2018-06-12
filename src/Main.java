@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -9,7 +8,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.simple.parser.ParseException;
-
 import com.sun.net.httpserver.HttpServer;
 
 public class Main {

@@ -23,20 +23,18 @@ public class WorkingRunnable implements Runnable {
 				jasone = (JSONArray) parser.parse(m.getBody());
 			} catch (ParseException e) {}
 			
-			float temp = 0, hum_morn = 0, rad = 0, hum_even = 0;
-			String coltura =null;
+			float temp = 0, rad = 0, hum = 0;
+			String coltura = null;
 			
 			for(Object o : jasone) {
 				JSONObject serra = (JSONObject) o;
 				coltura = (String) serra.get("coltura");
 				temp = Float.parseFloat((String) serra.get("temp"));
 				rad = Float.parseFloat((String) serra.get("rad"));
-				hum_morn = Float.parseFloat((String) serra.get("hum_morn"));
-				hum_even = Float.parseFloat((String) serra.get("hum_even"));
-				
+				hum = Float.parseFloat((String) serra.get("hum"));
 			}
-			// if controllo umidita` vero {
-			float time = calculateTime(coltura, temp, hum_morn, hum_even, rad);
+
+			float time = calculateTime(coltura, temp, hum, rad);
 			if(time!=0){
 				try {
 				st.notify_msg(new Message("WT", Main.ROOT_NAME+"/tt", "[{ \"coltura\" : \"" + coltura + "\", \"time\" : \"" + time + "\"}]"));
@@ -47,12 +45,12 @@ public class WorkingRunnable implements Runnable {
 		}
 	}
 	
-	public long calculateTime(String coltura, float temp, float hum_m, float hum_e, float rad) {
+	public long calculateTime(String coltura, float temp, float hum, float rad) {
 		long time = 0;
 		float i;
 		float litritot;
 		if (coltura.equals("Patate")) {
-			i = 45 - hum_e;
+			i = 45 - hum;
 			if(i>0){
 				litritot = (float)1.13 *i;
 				time = (long) ((litritot/15)*60);
@@ -61,7 +59,7 @@ public class WorkingRunnable implements Runnable {
 		}
 		
 		if (coltura.equals("Cavoli")) {
-			i = 65 - hum_e;
+			i = 65 - hum;
 			if(i>0){
 				litritot = (float)1.1 *i;
 				time = (long) ((litritot/10)*60);
@@ -69,7 +67,7 @@ public class WorkingRunnable implements Runnable {
 		}
 
 		if (coltura.equals("Pomodori")) {
-			i = 55 - hum_e;
+			i = 55 - hum;
 			if(i>0){
 				litritot = (float)0.8 *i;
 				time = (long) ((litritot/10)*60);
@@ -77,7 +75,7 @@ public class WorkingRunnable implements Runnable {
 		}
 		
 		if (coltura.equals("Piselli")) {
-			i = 60 - hum_e;
+			i = 60 - hum;
 			if(i>0){
 				litritot = (float)0.68 *i;
 				time = (long) ((litritot/10)*60);
