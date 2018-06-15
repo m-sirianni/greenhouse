@@ -7,7 +7,6 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -54,34 +53,29 @@ public class SubscriberRunnable implements Runnable {
 		client.setCallback(new MqttCallback() {
 			@Override
 	        public void messageArrived(String topic, MqttMessage message) throws InterruptedException {
-					
+				JSONParser parser2 = new JSONParser();
 				String io = message.toString();
-				ArrayList<String> ar = new ArrayList<String>();					
-				
+				JSONObject obj = null;
+				System.out.println(message.toString());
+				float val = 0;
+				try {
+					obj = (JSONObject) parser2.parse(io);
+					val = Float.parseFloat((String) obj.get("value"));
+				} catch (Exception e) { System.out.println( e.getMessage() ); }
+
 				if(topic.contains("Temperatura")){
-					ParsingThread pt = new ParsingThread(io, ar, topic);
-					Thread th = new Thread(pt);
-					th.start();
-					th.join();
-					if(cal.get(Calendar.HOUR_OF_DAY) < 18 && cal.get(Calendar.HOUR_OF_DAY) >= 8 ) {						
-						float f = Float.parseFloat(ar.remove(0));
-						temp += f;
+					if(cal.get(Calendar.HOUR_OF_DAY) < Main.EVENING && cal.get(Calendar.HOUR_OF_DAY) >= Main.MORNING) {						
+						temp += val;
 						cont++;
 					}
 				}
 					
 				if(topic.contains("Radiazione")){
-					ParsingThread pt = new ParsingThread(io, ar, topic);
-					Thread th = new Thread(pt);
-					th.start();
-					th.join();
-					if(cal.get(Calendar.HOUR_OF_DAY) < 18 && cal.get(Calendar.HOUR_OF_DAY) >= 8 ){
-						float f = Float.parseFloat(ar.remove(0));
-						rad += f;
-					}		
+					if(cal.get(Calendar.HOUR_OF_DAY) < Main.EVENING && cal.get(Calendar.HOUR_OF_DAY) >= Main.MORNING)
+						rad += val;
 				}
 					
-				if(cont == 5){
+				if(cont == 10){
 					temp_media = temp/cont;
 					temp = temp_media;
 					rad_media = rad/cont;
@@ -89,7 +83,7 @@ public class SubscriberRunnable implements Runnable {
 					cont = 1;
 				}
 				
-				if(flag==true){
+				if(flag == true){
 					flag = false;
 				    mex = new Message("ST", Main.ROOT_NAME+"/wt", "[{ \"coltura\" : \"" + coltura + "\", \"temp\" :\"" + temp_media + "\" , \"rad\" : \"" + rad_media + "\" , \"hum_morn\" : \"" + humidity_morn + "\" , \"hum_even\" : \"" + humidity_even + "\" }]");
 				}
@@ -105,22 +99,20 @@ public class SubscriberRunnable implements Runnable {
 		while (true) {
 			try {
 				m = mq.receive();
+				System.out.println("Messaggio ricevuto");
 			} catch (InterruptedException e) {}
 		
-			JSONArray jasone = null;
-			try { jasone = (JSONArray) parser.parse(m.getBody()); } catch (ParseException e) {}
+			JSONObject serra = null;
+			try { serra = (JSONObject) parser.parse(m.getBody()); } catch (ParseException e) {}
 			
 			String cmd = null;
-			
-			for(Object o : jasone) {
-				JSONObject serra = (JSONObject) o;
-				cmd = (String) serra.get("cmd");
-			}
+			cmd = (String) serra.get("cmd");
+			System.out.println(cmd);
 			
 			if(cmd.equals("start")) {
-				try { 
+				try {
 					client.connect();
-					client.subscribe(new String [] {Main.ROOT_NAME+"/Temperatura", Main.ROOT_NAME+"/Radiazione", Main.ROOT_NAME+"/humidity/"+coltura});
+					client.subscribe(new String [] {Main.ROOT_NAME+"/Temperatura", Main.ROOT_NAME+"/Radiazione"});
 				} catch (MqttException e) {}
 				
 				cal.setTimeInMillis(m.getTimeStamp().getTime());

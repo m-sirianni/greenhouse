@@ -1,12 +1,17 @@
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Set;
+
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import com.sun.net.httpserver.HttpServer;
 
@@ -16,10 +21,13 @@ public class Main {
 	public static double A;
 	public static double B;
 	public static String MQTT_IP;
+	public static final int MORNING = 8;
+	public static final int EVENING = 18;
 	public static Thread main_task;
 	public static Runnable main_runnable;
 	public static ArrayList<Thread> thread_list = new ArrayList<Thread>();
 	public static SubjectTable st = new SubjectTable();
+	public static MqttClient client;
 	
 	public static void main(String[] args) throws IOException, ParseException, MqttException, InterruptedException{
 
@@ -48,7 +56,7 @@ public class Main {
 			Main.thread_list.add(working);
 			System.out.println("-> Started working thread");
 	
-			MqttClient client = null;
+			client = null;
 			try {
 				client = new MqttClient( 
 					"tcp://" +Main.MQTT_IP+ ":1883",
@@ -58,20 +66,38 @@ public class Main {
 				
 			client.setCallback(new MqttCallback() {
 				@Override
-				public void messageArrived(String topic, MqttMessage message) throws ParseException, InterruptedException {
+				public void messageArrived(String topic, MqttMessage message) throws ParseException, InterruptedException, MqttException {
 					String io = message.toString();
+
+					String json = io.trim();
+					json = json.replaceAll("\"list\": ", "");
+					json = json.substring(1, json.length()-1);
+					JSONParser parser = new JSONParser();
+					JSONArray o = null;
+					try {
+						o = (JSONArray) parser.parse(json);
+					} catch (Exception e) {System.out.println("Eccezziunale veramente");}
+					
 					ArrayList<String> list = new ArrayList<String>();
-					ParsingThread pt = new ParsingThread(io, list, topic);
-					Thread th = new Thread(pt);
-					th.start();
-					th.join();
+					for (Object ob : o) {
+						Set<?> str =( (JSONObject) ob).keySet();
+						if(!str.toArray()[0].equals("Temperatura") && !str.toArray()[0].equals("Radiazione"))
+							list.add((String) "humidity/" + str.toArray()[0]);
+						else 
+							list.add((String) str.toArray()[0]);
+					}
+					
 					for(String str : list) {
 						if (str.contains("humidity")) {
 							Thread sub_th = new Thread(new SubscriberRunnable(st, str.split("/")[1]));
+							System.out.println("-> Started subscriber_" + str.split("/")[1] + " thread");
 							sub_th.start();
 							Main.thread_list.add(sub_th);
+							//System.out.println(Main.ROOT_NAME+"/st"+ str.split("/")[1]);
+							//st.notify_msg(new Message("st", Main.ROOT_NAME+"/st_"+ str.split("/")[1], "{\"cmd\":\"start\"}"));
 						}
-					}					
+					}
+					client.unsubscribe(Main.ROOT_NAME +"/wgetr");
 				}
 
 				@Override
@@ -86,7 +112,9 @@ public class Main {
 				System.out.println("-> MQTT client connected");
 				client.subscribe(Main.ROOT_NAME +"/wgetr");
 				client.publish(Main.ROOT_NAME +"/wget/t1234", new MqttMessage("DynamicPage.json".getBytes()));
-			} catch (MqttException e) {System.out.println(e.getMessage());}
+				Thread.sleep(2000);
+				st.notify_msg(new Message("st", Main.ROOT_NAME+"/st_"+ "Cavoli", "{\"cmd\":\"start\"}"));
+			} catch (MqttException e) {System.out.println(e.getMessage());} catch (InterruptedException e) {}
 			
 			/*try {
 				st.notify_msg(new Message("st", Main.ROOT_NAME+"/wt" , "[{ \"coltura\" : \"Patate\", \"temp\" :\"16.24722\" , \"rad\" : \"2205.8425\" , \"hum_morn\" : \"99.95362\" , \"hum_even\" : \"0.0\" }]"));
