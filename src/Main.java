@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -21,8 +22,8 @@ public class Main {
 	public static double A;
 	public static double B;
 	public static String MQTT_IP;
-	public static final int MORNING = 8;
-	public static final int EVENING = 18;
+	public static final LocalTime MORNING = LocalTime.of(8, 00, 00);
+	public static final LocalTime EVENING = LocalTime.of(18, 00, 00);
 	public static Thread main_task;
 	public static Runnable main_runnable;
 	public static ArrayList<Thread> thread_list = new ArrayList<Thread>();
@@ -68,7 +69,6 @@ public class Main {
 				@Override
 				public void messageArrived(String topic, MqttMessage message) throws ParseException, InterruptedException, MqttException {
 					String io = message.toString();
-
 					String json = io.trim();
 					json = json.replaceAll("\"list\": ", "");
 					json = json.substring(1, json.length()-1);
@@ -111,16 +111,9 @@ public class Main {
 				client.connect();
 				System.out.println("-> MQTT client connected");
 				client.subscribe(Main.ROOT_NAME +"/wgetr");
-				client.publish(Main.ROOT_NAME +"/wget/t1234", new MqttMessage("DynamicPage.json".getBytes()));
-				Thread.sleep(2000);
-				st.notify_msg(new Message("st", Main.ROOT_NAME+"/st_"+ "Cavoli", "{\"cmd\":\"start\"}"));
-			} catch (MqttException e) {System.out.println(e.getMessage());} catch (InterruptedException e) {}
-			
-			/*try {
-				st.notify_msg(new Message("st", Main.ROOT_NAME+"/wt" , "[{ \"coltura\" : \"Patate\", \"temp\" :\"16.24722\" , \"rad\" : \"2205.8425\" , \"hum_morn\" : \"99.95362\" , \"hum_even\" : \"0.0\" }]"));
-				st.notify_msg(new Message("st", Main.ROOT_NAME+"/wt" , "[{ \"coltura\" : \"Piselli\", \"temp\" :\"16.24722\" , \"rad\" : \"2205.8425\" , \"hum_morn\" : \"99.95362\" , \"hum_even\" : \"0.0\" }]"));
-			} catch (InterruptedException e) {}*/
-					
+				client.publish(Main.ROOT_NAME +"/wget/t1234", new MqttMessage(("DynamicPage.json").getBytes()));
+				
+			} catch (MqttException e) {System.out.println(e.getMessage());}
 		};
 
 	}

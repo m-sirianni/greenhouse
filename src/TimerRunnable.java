@@ -26,18 +26,17 @@ public class TimerRunnable implements Runnable {
 			try { jasone = (JSONArray) parser.parse(m.getBody()); } catch (ParseException e) {}
 			
 			String coltura = null;
-			long time = 0;
+			double time = 0;
 			for(Object o : jasone) {
 				JSONObject serra = (JSONObject) o;
 				coltura = (String) serra.get("coltura");
-				time = (long) Float.parseFloat((String) serra.get("time"));
+				time = (long) Double.parseDouble((String) serra.get("time"));
 			}
 			
 			String coltura1 = coltura;
-			// meglio usare il timestamp?
-						//if(LocalTime.now().getHour() < 8 || LocalTime.now().getHour() > 18 ) {
+			System.out.println("coltura " + coltura + " tempo " + time);
 			try {
-				st.notify_msg(new Message("TT", Main.ROOT_NAME+"/pt", "[{ \"coltura\" : \"" + coltura + "\", \"cmd\" : \"ON\"}]"));
+				st.notify_msg(new Message("TT", Main.ROOT_NAME+"/pt", "[{ \"coltura\" : \"" + coltura1 + "\", \"cmd\" : \"ON\"}]"));
 			} catch (InterruptedException e1) {}
 			
 			ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
@@ -48,7 +47,7 @@ public class TimerRunnable implements Runnable {
 				} catch (InterruptedException e) {}
 			};
 			
-			executor.schedule(task, time, TimeUnit.SECONDS);
+			executor.schedule(task, (long) time, TimeUnit.SECONDS);
 		}
 
 	}
