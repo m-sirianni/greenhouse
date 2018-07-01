@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/bin/sh
 
 # Logger
-mosquitto_sub -h 193.206.55.23 -t "serre2/control/set" -v | xargs -d$'\n' -L1 sh -c 'date "+%d.%m.%Y %T $0"' >> logger.txt
+mosquitto_sub -h 193.206.55.23 -t "serre2/control/set" -v | xargs -d '\n' -L1 sh -c 'date "+%d.%m.%Y %T $0"' >> logger.txt

@@ -9,7 +9,7 @@ import com.sun.net.httpserver.HttpHandler;
 public class RootHandler implements HttpHandler {
 	@Override
 	public void handle(HttpExchange he) throws IOException {
-		File index = new File("greenhau5/index_dyn_noserv.html");
+		File index = new File("greenhau5/index.html");
 		he.sendResponseHeaders(200, index.length());
 		OutputStream os = he.getResponseBody();
 		Files.copy(index.toPath(), os);

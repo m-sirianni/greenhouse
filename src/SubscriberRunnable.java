@@ -28,9 +28,7 @@ public class SubscriberRunnable implements Runnable {
 	public SubscriberRunnable(SubjectTable st, String coltura) {
 		this.st=st;
 		this.coltura=coltura;
-		temp = 0;
-		rad = 0;
-		cont = 0;
+		temp = rad = cont = 0;
 	}
 	
 	public void run() {
@@ -85,44 +83,34 @@ public class SubscriberRunnable implements Runnable {
 
 			@Override
 			public void connectionLost(Throwable arg0) {}
-
 			@Override
 			public void deliveryComplete(IMqttDeliveryToken arg0) {}
-			
-			
+				
 		});
 
-		
-			  	LocalDateTime localNow = LocalDateTime.now();
-		        ZoneId currentZone = ZoneId.systemDefault();
-		        ZonedDateTime zonedNow = ZonedDateTime.of(localNow, currentZone);
-		        ZonedDateTime zonedNext5 ;
-		        zonedNext5 = zonedNow.withHour(18).withMinute(00).withSecond(00);
-		        if(zonedNow.compareTo(zonedNext5) > 0)
-		            zonedNext5 = zonedNext5.plusDays(1);
+		LocalDateTime localNow = LocalDateTime.now();
+		ZoneId currentZone = ZoneId.systemDefault();
+		ZonedDateTime zonedNow = ZonedDateTime.of(localNow, currentZone);
+		ZonedDateTime zonedNext5 ;
+		zonedNext5 = zonedNow.withHour(18).withMinute(00).withSecond(00);
+		if(zonedNow.compareTo(zonedNext5) > 0)
+			zonedNext5 = zonedNext5.plusDays(1);
 
-		        Duration duration = Duration.between(zonedNow, zonedNext5);
-		        long initalDelay = duration.getSeconds();
+		Duration duration = Duration.between(zonedNow, zonedNext5);
+		long initalDelay = duration.getSeconds();
 
-		        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);            
-		        
-		        Runnable task = () -> {
-					try {
-						System.out.println(temp_media);
-						System.out.println(rad_media);
-						st.notify_msg(new Message("ST", Main.ROOT_NAME+"/wt", "[{ \"coltura\" : \"" + coltura + "\", \"temp\" :\"" + temp_media + "\" , \"rad\" : \"" + rad_media + "\" }]"));
-						rad=0;
-						temp=0;
-						cont=0;
-						temp_media=0;
-						rad_media=0;
-						
-					} catch (InterruptedException e) {}
-				};
+		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);            
+		      
+		Runnable task = () -> {
+			try {
+				System.out.println("Temperatura media della giornata: " + temp_media);
+				System.out.println("Radiazione media della giornata: " + rad_media);
+				st.notify_msg(new Message("ST", Main.ROOT_NAME+"/wt", "[{ \"coltura\" : \"" + coltura + "\", \"temp\" :\"" + temp_media + "\" , \"rad\" : \"" + rad_media + "\" }]"));
+				rad=temp=cont=(int) (temp_media=rad_media=0);	
+			} catch (InterruptedException e) {}
+		};
 				
-				scheduler = Executors.newScheduledThreadPool(1);
-				scheduler.scheduleAtFixedRate(task, initalDelay,24*60*60, TimeUnit.SECONDS);
-		
-	}
-
+		scheduler = Executors.newScheduledThreadPool(1);
+		scheduler.scheduleAtFixedRate(task, initalDelay,24*60*60, TimeUnit.SECONDS);
+}
 }

@@ -45,7 +45,7 @@ public class Main {
 			Thread publisher = new Thread(new PublisherRunnable());
 			publisher.start();
 			Main.thread_list.add(publisher);
-			System.out.println("-> Started publisher");
+			System.out.println("-> Started publisher thread");
 			
 			Thread timer = new Thread(new TimerRunnable());
 			timer.start();
@@ -76,7 +76,7 @@ public class Main {
 					JSONArray o = null;
 					try {
 						o = (JSONArray) parser.parse(json);
-					} catch (Exception e) {System.out.println("Eccezziunale veramente");}
+					} catch (Exception e) {System.out.println("Errore di parsing");}
 					
 					ArrayList<String> list = new ArrayList<String>();
 					for (Object ob : o) {

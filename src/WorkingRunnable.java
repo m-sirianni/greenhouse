@@ -40,10 +40,10 @@ public class WorkingRunnable implements Runnable {
 		}
 	}
 	
-	public double calculateTime(float temp, float rad) {
+	public long calculateTime(float temp, float rad) {
 		double deltaHum = temp*Main.A + rad*Main.B;
 		double time = deltaHum * 2.5;
-		return time;		
+		return (long) time;		
 	}
 
 }

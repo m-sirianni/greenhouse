@@ -30,11 +30,10 @@ public class TimerRunnable implements Runnable {
 			for(Object o : jasone) {
 				JSONObject serra = (JSONObject) o;
 				coltura = (String) serra.get("coltura");
-				time = (long) Double.parseDouble((String) serra.get("time"));
+				time = Double.parseDouble((String) serra.get("time"));
 			}
 			
 			String coltura1 = coltura;
-			System.out.println("coltura " + coltura + " tempo " + time);
 			try {
 				st.notify_msg(new Message("TT", Main.ROOT_NAME+"/pt", "[{ \"coltura\" : \"" + coltura1 + "\", \"cmd\" : \"ON\"}]"));
 			} catch (InterruptedException e1) {}
