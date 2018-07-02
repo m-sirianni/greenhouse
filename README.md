@@ -8,3 +8,7 @@
 * Compilare e avviare l'eseguibile.
 * Aprendo la pagina web "localhost:10046" da browser sarà possibile trovare la pagina di configurazione e reset della piattaforma. Per avviare il programma caricare il file di configurazione "config.json", presente in "greenhau5". Dopo averlo selezionato, il sistema parserà automaticamente i dati e li invierà all'applicazione.
 * Per utilizzare in maniera interattiva il software di gestione della serra, aprire l'interfaccia locale "index.html" presente in "greenhau5".
+
+## Rapporto tecnico
+* Il rapporto tecnico è nel file "relazione_reti2.pdf"
+* In "uml.pdf" è presente l'approccio UML utilizzato per la progettazione dell'applicazione
