@@ -25,10 +25,10 @@ public class ResetHandler implements HttpHandler {
 		Main.main_task.stop();
 		System.out.println("Stopped main task");
 
-		Main.A = 1.0;
+		Main.A = 0.11;
 		System.out.println("A set to default");
 
-		Main.B = 0.1;
+		Main.B = 0.0046;
 		System.out.println("B set to default");
 
 		Main.MQTT_IP = "193.206.55.23";

@@ -21,32 +21,60 @@
 </div>
 <div class="container"></div>
 <div id="config">
-	<p align="center">Caricare il file di configurazione</p>
-	<p align="center"><input type="file" id="input"></p>
-</div>
+	<p align="center">Scrivere i parametri di configurazione da inviare</p>
+ <form class="form-horizontal" data-toggle="validator" role="form" onsubmit="return submit1()">
 
+
+  <div class="form-group">
+    <label class="control-label col-md-2 col-md-offset-4" for="ip_form">IP Address:</label>
+    <div class="col-md-1 ">
+      
+			<input type="text" pattern="^\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b$" maxlength="15" class="form-control" id="ip_form" placeholder="127.0.0.1" required name="ip_form">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="control-label col-md-2 col-md-offset-4" for="a_form">Temperature constant:</label>
+    <div class="col-md-1">
+      <input type="text" pattern="^[-+]?[0-9]*\.?[0-9]+$" class="form-control" id="a_form" placeholder="0.0001" required name="a_form">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="control-label col-md-2 col-md-offset-4" for="b_form">Radiation constant:</label>
+    <div class="col-md-1">
+      <input type="text" pattern="^[-+]?[0-9]*\.?[0-9]+$" class="form-control" id="b_form" placeholder="0.0001" required name="b_form">
+    </div>
+  </div>
+	
+	<div id="Submit">
+		<p align="center"><button type="submit">Submit</button></p>
+		</br>
+	</div>
+</form>
 <div id="reset">
 	<p align="center">Per resettare l'applicazione, premere su "Reset"</p>
-	<p align="center"><button onclick="reset()">Reset</button></p>
+	<p align="center"><button onclick="reset()" >Reset</button></p>
 </div>
 
 <script>
 
-document.getElementById('input').onchange = function(){
-	var file = this.files[0];
-	var reader = new FileReader();
-	reader.onload = function(progressEvent){
-		$.ajax({ type: "POST", url: "/load", data: reader.result, 
-			success: function(d) {console.log("OK");},
-			error: function(d) {console.log("Male male");}
-		});
-	};
-	reader.readAsText(file);
-};
-
 function reset() {
+
 		$.ajax({ type: "POST", url: "/reset", data: "reset", 
 		success: function(d) {console.log("OK");},
+		error: function(d) {console.log("Male male");}
+	});
+}
+
+function submit1() {	
+		var a = $('#a_form').val();
+		var b = $('#b_form').val();
+		var ip = $('#ip_form').val();
+		var cmd = '{"a":' +a+ ', "b":' +b+ ', "ip":"' +ip+ '"}';
+		console.log(cmd);
+		$.ajax({ type: "POST", url: "/load", data: cmd, 
+		success: function(d) {console.log(cmd);},
 		error: function(d) {console.log("Male male");}
 	});
 }
